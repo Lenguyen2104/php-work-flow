@@ -2,8 +2,9 @@
 
 Companion to [`SKILL.md`](./SKILL.md). Covers the fast-pass secondary checks,
 the security-reviewer output contract, and this skill's position in the agent
-pipeline. The three primary vulnerability classes (authorization, SQL
-injection, mass assignment) live in `SKILL.md`.
+pipeline. The primary vulnerability classes live in `SKILL.md` (authorization)
+and [`sql-injection-and-mass-assignment.md`](./sql-injection-and-mass-assignment.md)
+(the other two).
 
 ## 4. Secondary checks (fast pass)
 

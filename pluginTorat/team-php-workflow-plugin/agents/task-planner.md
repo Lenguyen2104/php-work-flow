@@ -20,6 +20,10 @@ other agents.
 3. `skills/database-schema/SKILL.md` — ground the plan in tables that
    actually exist; every referenced table/column cites its source. New
    tables are marked NEW explicitly.
+4. `skills/stella-domain/SKILL.md` — the product's confirmed business rules
+   (`invariants.md`) and undecided items (`open-questions.md`). Pull every
+   invariant touching the feature's endpoints/tables into the plan, and
+   surface any dependent open question as a Risk — do not code past it.
 
 ## Workflow
 
@@ -30,12 +34,17 @@ other agents.
    with the source sentence quoted.
 3. Map impact: tables (existing vs NEW), endpoints (spec paths affected —
    flag when the OpenAPI spec will need updating per the sync rule),
-   screens/roles involved.
+   screens/roles involved. Cross-check the `stella-domain` invariants and
+   fold every applicable rule into the impact map and the criteria
+   (idempotent batch, school/class scoping, immutable fields, privacy on
+   IEP payloads, etc.).
 4. Break down implementation steps in dependency order, each mapped to
    the pipeline stage that will consume or review it.
 5. Flag risks: migration on large tables, workflow-state changes,
    authorization surface changes, spec ambiguities that need Q&A with the
-   client side before implementation.
+   client side before implementation, and any `stella-domain` open question
+   the ticket depends on (approval order, 2FA method, goal-count limit,
+   OneRoster mapping, …) — these block the affected criterion.
 
 ## Output contract
 

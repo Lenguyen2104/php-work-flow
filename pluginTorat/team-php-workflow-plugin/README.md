@@ -140,6 +140,7 @@ implement until tests pass
 | `db-migration-safety` | FK/index, NOT NULL backfill, breaking changes, locking | db-migration-reviewer |
 | `php-security` | Authz two-layer rule, SQL injection, mass assignment | security-reviewer |
 | `database-schema` | How to derive field names from live sources; generated snapshot | ALL agents (shared capability) |
+| `stella-domain` | Product business rules (`invariants.md`) + undecided items (`open-questions.md`), distilled from the system-overview deck | task-planner (plan), security-reviewer (RBAC/authz), api-verifier (contract) |
 | `agent-pipeline` | Stage order, handoff artifacts, loop budgets L1–L7 | orchestrator (main session) |
 
 Design invariant: **agents contain workflow only; every rule lives in
@@ -150,13 +151,13 @@ drift and treated as a defect.
 
 | Stage | Agent | Skill(s) read | Skipped when |
 |---|---|---|---|
-| 1 | task-planner | project-architecture, database-schema, agent-pipeline | never |
+| 1 | task-planner | project-architecture, database-schema, stella-domain, agent-pipeline | never |
 | 2 | test-writer | phpunit-testing, database-schema, agent-pipeline | no acceptance criteria → blocked, not skipped |
 | 3 | (implementation — main session) | — | — |
 | 4 | convention-reviewer | php-conventions, project-architecture, agent-pipeline | never |
 | 5 | db-migration-reviewer | db-migration-safety, database-schema, agent-pipeline | no files under `database/migrations/` in diff |
-| 6 | security-reviewer | php-security, database-schema, agent-pipeline | never |
-| 7 | api-verifier | api-standards, phpunit-testing, agent-pipeline | no routes/controllers/resources in diff |
+| 6 | security-reviewer | php-security, database-schema, stella-domain, agent-pipeline | never |
+| 7 | api-verifier | api-standards, phpunit-testing, stella-domain, agent-pipeline | no routes/controllers/resources in diff |
 
 All agents write artifacts to `.claude/pipeline/<ticket-id>/<NN>-<agent>.md`
 with the standard header (`ticket / agent / round / input-commit / status`).

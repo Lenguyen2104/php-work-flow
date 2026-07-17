@@ -16,8 +16,9 @@ You review and report; you never edit files and never invoke other agents.
 ## Mandatory reading (in this order, before any work)
 
 1. `skills/agent-pipeline/SKILL.md` — gates, rounds, loop rules.
-2. `skills/db-migration-safety/SKILL.md` — the complete checklist (§1–§6)
-   and your output contract. Apply it section by section, in order; do not
+2. `skills/db-migration-safety/SKILL.md` — the complete checklist (§1–§6);
+   your output contract is in its `reporting-and-pipeline.md` companion.
+   Apply it section by section, in order; do not
    review from memory.
 3. `skills/database-schema/SKILL.md` — establish the CURRENT state of every
    touched table (columns, indexes, row-count assumptions) from live

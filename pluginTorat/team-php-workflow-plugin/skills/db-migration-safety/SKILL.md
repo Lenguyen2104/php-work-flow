@@ -102,27 +102,10 @@ lock the table (see §4).
 - Timestamps + soft deletes follow existing table conventions; a new table
   deviating (no `deleted_at` where siblings have it) needs justification.
 
-## Output contract for the db-migration-reviewer agent
+## Reporting & pipeline position
 
-Produce a findings table:
+The db-migration-reviewer **output contract** (findings table + severity
+levels) and this skill's **pipeline position** (stage 5, gates, round-2
+scope) are in a companion file:
 
-| # | Severity | Location | Issue | Why it passes review but breaks prod | Fix |
-
-Severity levels: `blocker` (will fail or lock in prod), `major` (data
-integrity / performance risk), `minor` (convention). Include the concrete
-corrected migration code for every blocker and major. If table sizes are
-unknown, state the assumption ("assuming `students` exceeds 100k rows in
-production") rather than guessing silently.
-
-## Pipeline position
-
-Stage 5 of the agent pipeline (see the `agent-pipeline` skill — its rules
-override this section on conflict). Gate to start: convention-reviewer's
-artifact (`04-*.md`) has `status: pass` or all its blockers are marked
-resolved. Skipped entirely when the diff contains no files under
-`database/migrations/`. Write output to
-`.claude/pipeline/<ticket-id>/05-db-migration-reviewer.md` with the standard
-header. Finding IDs use `db-migration-reviewer/<rule>/<file>:<symbol>`.
-Round-2 runs verify prior findings and newly changed lines only (rule L3);
-never re-report `wontfix` findings. Do not invoke any other agent — issues
-outside migration scope get `severity: info, route-to: <agent>`.
+→ See [`reporting-and-pipeline.md`](./reporting-and-pipeline.md)

@@ -100,28 +100,10 @@ final class SubmitIepTest extends TestCase
 
 Keep this ordering. Reviewers scan top-down expecting it.
 
-## Output contract for the test-writer agent
+## Reporting & pipeline position
 
-When generating tests from a ClickUp task, always produce:
+The test-writer **output contract** (criteria→test matrix, files, factories,
+ambiguous-criteria list) and this skill's **pipeline position** (stage 2,
+plan-approval gate) are in a companion file:
 
-1. A short **criteria → test matrix** (table: criterion, test method(s),
-   type) so the reviewer can verify nothing was dropped.
-2. The test file(s).
-3. Any new/updated factories.
-4. A list of **untestable or ambiguous criteria** that need clarification —
-   never fabricate behavior to make a criterion testable.
-
-Run `./vendor/bin/phpunit --filter <NewClass>` before presenting results if
-an executable environment is available; include failures verbatim.
-
-## Pipeline position
-
-Stage 2 of the agent pipeline (see the `agent-pipeline` skill — its rules
-override this section on conflict). Gate to start: `01-task-planner.md`
-exists, conforms to the task-planner output contract, and the human has
-approved the plan. Write output to
-`.claude/pipeline/<ticket-id>/02-test-writer.md` with the standard header
-(`ticket / agent / round / input-commit / status`). Do not invoke any other
-agent; if acceptance criteria are missing or contradictory, set
-`status: blocked` and stop — do not fabricate criteria to keep the pipeline
-moving.
+→ See [`reporting-and-pipeline.md`](./reporting-and-pipeline.md)

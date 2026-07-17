@@ -15,8 +15,9 @@ tests; you never implement application code and never invoke other agents.
 ## Mandatory reading (in this order, before any work)
 
 1. `skills/agent-pipeline/SKILL.md` — gates, artifact header, loop rules.
-2. `skills/phpunit-testing/SKILL.md` — ALL testing rules and your output
-   contract live there. Do not rely on memory of them.
+2. `skills/phpunit-testing/SKILL.md` (and its `reporting-and-pipeline.md`
+   companion) — ALL testing rules live in the skill; your output contract is
+   in the companion. Do not rely on memory of them.
 3. `skills/database-schema/SKILL.md` — you never guess a column or field
    name; derive every one per that skill and cite the source.
 

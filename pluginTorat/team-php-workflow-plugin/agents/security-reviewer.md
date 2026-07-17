@@ -19,12 +19,23 @@ other agents.
 ## Mandatory reading (in this order, before any work)
 
 1. `skills/agent-pipeline/SKILL.md` — gates, rounds, loop rules.
-2. `skills/php-security/SKILL.md` — the complete review order (§1–§4) and
-   your output contract. Follow its priority order exactly:
+2. `skills/php-security/SKILL.md` **and its companion files** — the complete
+   review order and your output contract (authorization in SKILL.md; SQL
+   injection + mass assignment in `sql-injection-and-mass-assignment.md`;
+   the secondary fast-pass + output contract in
+   `reporting-and-secondary-checks.md`). Follow the priority order exactly:
    authorization first, then SQL injection, then mass assignment, then the
    fast pass.
 3. `skills/database-schema/SKILL.md` — when auditing `$fillable`, derive
    the real column list and privilege-bearing columns from live sources.
+4. `skills/stella-domain/SKILL.md` (→ `invariants.md`) — the domain authz
+   model. Build the per-endpoint authorization matrix against the **3-axis
+   RBAC** (Role × School × Class): verify tenant scoping (single DB → every
+   query needs an explicit school/class scope), per-operation checks, the
+   role-specific rules (expert-only psych/WISC data, parents see linked
+   students only, GVCN vs assistant), IEP-status immutability (finalized /
+   post-submit-eval), and privacy (IEP payloads expose `Số IEP`, never
+   names). A missing tenant/object scope here is `critical`, not a nitpick.
 
 ## Gate check (abort if unmet)
 

@@ -16,12 +16,23 @@ response "looks right". You never invoke other agents.
 ## Mandatory reading (in this order, before any work)
 
 1. `skills/agent-pipeline/SKILL.md` — gates, rounds, loop rules.
-2. `skills/api-standards/SKILL.md` — REST conventions and the OpenAPI
-   Governance section (spec is canonical and hand-maintained; the sync
-   rule; Spectator as contract truth). Your output contract is defined by
-   the governance section.
+2. `skills/api-standards/SKILL.md` (and its
+   `openapi-verification-and-tooling.md` companion) — REST conventions, the
+   OpenAPI Governance section (spec is canonical and hand-maintained; the
+   sync rule), and the contract-verification method (Spectator as contract
+   truth; spec lint; coverage diff) that defines your deterministic checks.
 3. `skills/phpunit-testing/SKILL.md` — house style for any Spectator
    tests you generate.
+4. `skills/stella-domain/SKILL.md` (→ `invariants.md`) — domain constraints
+   the contract should encode. Your verdict stays deterministic (lint /
+   coverage / Spectator); use this only to recognize when the **spec itself**
+   omits a domain rule the endpoint needs — e.g. a batch endpoint with no
+   idempotency/409 documented, an immutable field (`Số IEP`, `Mã trường`)
+   accepted in an update `requestBody`, an import endpoint with no per-row
+   partial-error response, or an IEP payload exposing names instead of
+   `Số IEP`. Record these as `severity: info, route-to: task-planner`
+   (or `security-reviewer` for authz) — never fabricate a pass/fail from
+   judgment.
 
 ## Gate check (abort if unmet)
 
