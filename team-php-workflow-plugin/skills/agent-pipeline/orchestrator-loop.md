@@ -18,12 +18,15 @@ question — it ends the run.
 ## Drive sequence for ticket `<id>`
 
 1. **Stage 1 — task-planner.** Dispatch it. On return: summarize normalized
-   acceptance criteria, affected tables/endpoints/screens, risk flags.
+   acceptance criteria, affected tables/endpoints/screens, risk flags —
+   in Vietnamese (SKILL.md "Output language").
    **STOP for approval.** If the task has no acceptance criteria → write
    `status: blocked`, escalate, do not improvise them.
 2. **Stage 2 — test-writer.** After approval, dispatch it (gate: `01` valid +
    approved). It writes tests + factories from the criteria matrix.
-3. **Stage 3 — implementation (main session, not an agent).** Write the
+3. **Stage 3 — implementation (main session, not an agent).** Follow the
+   `implementation` skill (no code comments; OpenAPI/Swagger docs updated in
+   the same commit as any endpoint change). Write the
    application code that makes the stage-2 tests pass. Run
    `./vendor/bin/phpunit` and iterate until green. PostToolUse hooks
    (phpcs/phpstan) run automatically on each edit; clear their blocks before

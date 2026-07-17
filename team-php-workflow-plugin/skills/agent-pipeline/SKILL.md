@@ -57,13 +57,32 @@ When the orchestrator fixes all blockers from an artifact whose status is
 accepts either `status: pass` or this marker as gate satisfaction — never
 edit `status` itself; it records what the agent concluded.
 
+## Output language
+
+All human-facing pipeline prose is written in **Vietnamese** so the team
+can review it fast: plan summaries, artifact bodies (findings
+descriptions, fixes, notes), consolidated findings tables, escalation
+messages, and `/pipeline-status` reports.
+
+Stays **English** (machine-parsed or governed by `php-conventions`):
+
+- Artifact header fields and values (`ticket / agent / round /
+  input-commit / status: pass | findings | blocked`,
+  `blockers-resolved: true`) — hooks parse these.
+- Severity labels (`blocker / critical / major / minor / info`) and
+  finding IDs — L-rules key on them.
+- Code, identifiers, commit messages, test names, and the OpenAPI spec.
+
+Rule of thumb: if a hook or an L-rule reads it → English; if a human
+reads it → Vietnamese.
+
 ## Stage order
 
 | Stage | Agent | Gate (input required) | Skip condition |
 |-------|-------|----------------------|----------------|
 | 1 | task-planner | ClickUp task accessible | never |
 | 2 | test-writer | 01-task-planner.md valid; human approved the plan | task has no acceptance criteria → escalate instead |
-| 3 | (implementation — main session, not an agent) | 02-test-writer.md valid | — |
+| 3 | (implementation — main session, not an agent; rules: `implementation` skill) | 02-test-writer.md valid | — |
 | 4 | convention-reviewer | implementation diff exists; hooks (phpcs/phpstan) pass | never — always runs |
 | 5 | db-migration-reviewer | 04 artifact `status: pass` or all its blockers resolved | diff contains no files under database/migrations/ |
 | 6 | security-reviewer | previous stage gate passed | never — always runs |

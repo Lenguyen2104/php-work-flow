@@ -55,7 +55,9 @@ See the `project-architecture` skill for layer semantics. Placement here:
 - **English only** in code: identifiers, comments, commit-facing strings.
   Vietnamese/Japanese appear only in user-facing translation files and in
   test fixtures that deliberately test multibyte input (marked with a
-  comment). This rule applies to the standards documents' own examples —
+  comment). Pipeline artifacts and plan/review prose are NOT code — they
+  are written in Vietnamese per the `agent-pipeline` skill's "Output
+  language" section. This rule applies to the standards documents' own examples —
   self-consistency is checked.
 - Explicit return types and parameter types everywhere; `mixed` requires
   a comment explaining why.
@@ -65,3 +67,7 @@ See the `project-architecture` skill for layer semantics. Placement here:
 - Mutable workflow entities use optimistic locking (`lock_version`);
   update paths must check-and-increment it.
 - No dead code, no commented-out code committed.
+- **No code comments** beyond the exceptions listed in the
+  `implementation` skill (phpstan-required PHPDoc, runtime attributes,
+  the justifications this file demands). That skill owns the rule; a
+  comment outside its allowed list is a `major` finding.

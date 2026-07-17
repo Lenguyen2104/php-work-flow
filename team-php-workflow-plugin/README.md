@@ -166,11 +166,12 @@ implement until tests pass
 | `project-architecture` | Layers, DI, no-Repository rule | convention-reviewer, task-planner |
 | `api-standards` | REST conventions, error format, versioning, **OpenAPI governance** | api-verifier |
 | `phpunit-testing` | Test taxonomy, criteria→test mapping, house style | test-writer |
+| `implementation` | Stage-3 coding rules: **no code comments**, API docs (OpenAPI/Swagger) in same commit | orchestrator (main session, stage 3) |
 | `db-migration-safety` | FK/index, NOT NULL backfill, breaking changes, locking | db-migration-reviewer |
 | `php-security` | Authz two-layer rule, SQL injection, mass assignment | security-reviewer |
 | `database-schema` | How to derive field names from live sources; generated snapshot | ALL agents (shared capability) |
 | `stella-domain` | Product business rules (`invariants.md`) + undecided items (`open-questions.md`), distilled from the system-overview deck | task-planner (plan), security-reviewer (RBAC/authz), api-verifier (contract) |
-| `agent-pipeline` | Stage order, handoff artifacts, loop budgets L1–L7 | orchestrator (main session) |
+| `agent-pipeline` | Stage order, handoff artifacts, loop budgets L1–L7, **output language (tiếng Việt cho prose)** | orchestrator (main session) |
 
 Design invariant: **agents contain workflow only; every rule lives in
 exactly one skill.** Duplicating a rule into an agent file is version
@@ -182,7 +183,7 @@ drift and treated as a defect.
 |---|---|---|---|
 | 1 | task-planner | project-architecture, database-schema, stella-domain, agent-pipeline | never |
 | 2 | test-writer | phpunit-testing, database-schema, agent-pipeline | no acceptance criteria → blocked, not skipped |
-| 3 | (implementation — main session) | — | — |
+| 3 | (implementation — main session) | implementation, api-standards | — |
 | 4 | convention-reviewer | php-conventions, project-architecture, agent-pipeline | never |
 | 5 | db-migration-reviewer | db-migration-safety, database-schema, agent-pipeline | no files under `database/migrations/` in diff |
 | 6 | security-reviewer | php-security, database-schema, stella-domain, agent-pipeline | never |
