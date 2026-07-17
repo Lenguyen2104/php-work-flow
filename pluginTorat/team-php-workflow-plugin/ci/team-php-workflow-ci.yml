@@ -1,0 +1,123 @@
+# team-php-workflow — server-side gate (per-PR).
+#
+# This file lives in the LARAVEL REPO, not in the plugin. Copy it to
+# .github/workflows/team-php-workflow-ci.yml there.
+#
+# It re-checks, at the one point every PR must pass, three rules the
+# per-edit hooks only check on a dev machine inside Claude Code. The
+# duplication is deliberate: hooks give feedback in seconds while coding;
+# CI is the final authority a hand-edit or a parser-less machine cannot slip
+# past. Same logic, different enforcement point.
+#
+# Adjust the marked <<ADJUST>> spots (PHP version, DB engine/credentials) to
+# your project.
+
+name: team-php-workflow
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # --- Rule 1: OpenAPI drift (mirror of openapi-drift-guard.sh) -------------
+  # If the PR changes API surface but not docs/openapi/, and no commit or the
+  # PR body carries a 'contract-invisible' justification, fail.
+  openapi-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check spec was updated alongside API surface
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+          changed=$(git diff --name-only "$BASE...$HEAD")
+          echo "Changed files:"; echo "$changed" | sed 's/^/  /'
+
+          api_re='^(app/Http/(Requests|Resources|Controllers)/.*\.php|routes/api\.php)$'
+          api_touched=$(echo "$changed" | grep -E "$api_re" || true)
+          spec_touched=$(echo "$changed" | grep -E '^docs/openapi/' || true)
+
+          if [[ -z "$api_touched" ]]; then
+            echo "No API-surface files changed — rule N/A."; exit 0
+          fi
+          if [[ -n "$spec_touched" ]]; then
+            echo "API surface changed and docs/openapi/ was updated — OK."; exit 0
+          fi
+
+          # Escape hatch: 'contract-invisible' in any PR commit message or the body.
+          if git log --format='%B' "$BASE...$HEAD" | grep -qi 'contract-invisible' \
+             || echo "${PR_BODY:-}" | grep -qi 'contract-invisible'; then
+            echo "API surface changed without a spec change, but a 'contract-invisible'"
+            echo "justification is present — allowed."
+            exit 0
+          fi
+
+          echo "::error::API-surface files changed but docs/openapi/ was not updated."
+          echo "Update docs/openapi/openapi.yaml in this PR (requestBody/response"
+          echo "schemas, status codes, security), or add a 'contract-invisible'"
+          echo "justification to a commit message or the PR body."
+          echo "Offending files:"; echo "$api_touched" | sed 's/^/  /'
+          exit 1
+
+  # --- Rule 2: OpenAPI spec lint (mirror of api-verifier step 1) ------------
+  spec-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: spectral lint
+        run: npx --yes @stoplight/spectral-cli lint docs/openapi/openapi.yaml
+
+  # --- Rule 3: Schema snapshot freshness (mirror of migration reminder) -----
+  # Run migrations on a throwaway DB, regenerate docs/schema/, and fail if the
+  # committed snapshot differs — i.e. a migration shipped without its snapshot.
+  schema-snapshot:
+    runs-on: ubuntu-latest
+    services:
+      mysql: # <<ADJUST>> swap for postgres if that's your stack
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testing
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3' # <<ADJUST>>
+          extensions: mbstring, pdo_mysql
+          coverage: none
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Migrate + regenerate snapshot + assert clean
+        env:
+          DB_CONNECTION: mysql # <<ADJUST>>
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: |
+          set -euo pipefail
+          cp -n .env.example .env || true
+          php artisan key:generate --force
+          php artisan migrate --force
+          bash scripts/regenerate-schema-snapshot.sh
+          if ! git diff --exit-code -- docs/schema/; then
+            echo "::error::docs/schema/ is stale. A migration changed the schema"
+            echo "but the committed snapshot was not regenerated. Run"
+            echo "bash scripts/regenerate-schema-snapshot.sh and commit docs/schema/."
+            exit 1
+          fi

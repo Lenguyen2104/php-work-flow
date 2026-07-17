@@ -1,0 +1,8 @@
+{
+  "name": "team-php-workflow",
+  "version": "0.1.0",
+  "description": "Laravel team workflow: ClickUp task planning, test generation from acceptance criteria, four-stage sequential review (conventions, migrations, security, API contract) with hard anti-loop gates enforced by hooks.",
+  "author": {
+    "name": "Stella Plan Dev Team"
+  }
+}
