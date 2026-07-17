@@ -79,6 +79,19 @@ After stage 7, the orchestrator collects all `blocker`/`critical`/`major`
 findings, fixes them in ONE batch, commits, then re-runs **only the
 reviewers that reported those findings**, in stage order, as round 2.
 
+## Self-driving mode
+
+`/team-php-workflow:run <ticket>` drives stages 1→7 end to end, stopping only
+once for human approval of the plan (stage 1→2 gate) and again only if an
+L-rule escalates. The exact auto-advance procedure — the single checkpoint,
+the auto fix cycle, what auto-applies vs. what escalates — is a companion:
+
+→ See [`orchestrator-loop.md`](./orchestrator-loop.md)
+
+The per-stage commands (`/plan-ticket`, `/review`, `/pipeline-status`) remain
+for running one segment manually; `run` is the same pipeline with the human
+prompts between stages removed except the plan checkpoint.
+
 ## Loop-prevention rules (hard limits)
 
 The seven hard limits (L1–L7) that bound review/fix cycles — retry budgets,

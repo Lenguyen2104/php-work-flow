@@ -41,7 +41,7 @@ just `/plugin` and pick it from the list.
 ```
 /plugin list   # team-php-workflow shows enabled
 /agents        # 6 agents: task-planner … api-verifier
-/help          # 3 commands: /plan-ticket, /review, /pipeline-status
+/help          # 4 commands: /run, /plan-ticket, /review, /pipeline-status
 ```
 
 **Manage it later:**
@@ -99,8 +99,37 @@ Notes:
 
 ## Usage — run a ticket end to end
 
-Drive it from the main session. The commands standardize the entry points;
-the hooks keep you on the rails. A full ticket:
+Two ways to drive a ticket: **self-driving** (one command runs everything) or
+**manual** (one command per segment, for when you want to inspect between
+stages).
+
+### Self-driving — `/team-php-workflow:run <ticket-id>`
+
+```
+/team-php-workflow:run ABC-123
+```
+
+Runs stages 1→7 on its own and **stops only once** — to let you approve the
+plan after stage 1 — then goes hands-off: writes tests, implements until they
+pass, runs all reviewers in order, auto-applies every `≥ major` fix, and
+re-reviews (round 2) until it reaches a terminal state:
+
+- **Done** — all applicable reviewers `status: pass`.
+- **Blocked** — an anti-loop budget (L1/L2/L5) fired, or a finding needs a
+  human call (an OpenAPI spec-vs-code conflict, or a security `critical` that
+  needs new authorization design). It stops with one consolidated findings
+  table + which rule fired + the exact next action. It never starts a round 3
+  or auto-resumes; resuming is an explicit instruction from you.
+
+The single plan checkpoint is deliberate — this system holds minors' data, so
+you confirm *what* gets built before code and fixes flow automatically. The
+loop is defined in `agent-pipeline/orchestrator-loop.md`; the same gates and
+budgets apply as in manual mode.
+
+### Manual — one command per segment
+
+The commands standardize the entry points; the hooks keep you on the rails.
+A full ticket:
 
 | Step | You run | What happens |
 |---|---|---|
@@ -169,6 +198,7 @@ rounds, round-2 scope freeze, no-progress halt, no agent-to-agent calls).
 
 | Command | Does | Notes |
 |---|---|---|
+| `/run <ticket-id>` | **Self-driving** — runs stages 1→7 end to end, stopping only to approve the plan (and on L-rule escalation) | Requires ClickUp OAuth; auto-applies `≥ major` fixes, obeys the 2-round budget |
 | `/plan-ticket <ticket-id>` | Dispatches stage 1 (task-planner) for a ClickUp ticket, then stops for human approval of the plan | Requires ClickUp OAuth (see Setup) |
 | `/review [ticket-id]` | Runs the review stages 4→7 in order on the current diff, honoring `pipeline-gate.sh`, and returns one consolidated findings table | Defaults to the newest ticket dir; enforces the 2-round budget |
 | `/pipeline-status [ticket-id]` | Read-only report of which stages ran, their round/status, open blockers, and the next action | Never dispatches or edits |
