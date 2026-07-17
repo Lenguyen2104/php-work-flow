@@ -20,6 +20,10 @@ and [`sql-injection-and-mass-assignment.md`](./sql-injection-and-mass-assignment
   (`return $user;`) leak columns added later. Require explicit
   `JsonResource` field lists. Exceptions/stack traces in JSON responses
   (`APP_DEBUG` assumptions) — responses must not echo internal messages.
+- **Spec/docs exposure**: `/docs` and `/docs/openapi.yaml` must be
+  env-gated — public only in local, 404 or admin auth everywhere else.
+  Rule owned by `api-standards` ("Spec & docs exposure"); routes
+  reachable without the gate in non-local config → `major`.
 - **Auth flows**: OTP/2FA and password endpoints — no user enumeration via
   differing error messages/timing, rate limiting present
   (`ThrottleRequests`), OTP single-use and expiring.

@@ -47,7 +47,7 @@ the same commit**, never "later":
 
 1. **OpenAPI spec** — update `docs/openapi/openapi.yaml` per the sync
    table in the `api-standards` skill. That skill is canonical for spec
-   conventions (shared `Error` component, `$ref` reuse, nullable rules);
+   conventions (shared `Envelope` component, `$ref` reuse, nullable rules);
    this rule only fixes *when*: same commit as the code change. The
    openapi-drift-guard hook blocks the commit otherwise.
 2. **Swagger, if the project already uses it** — when the target project

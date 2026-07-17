@@ -24,26 +24,42 @@ description: >
   unauthorized, 404 not-found-or-cross-tenant (never reveal existence of
   another school's record via 403 — return 404), 409 optimistic-lock
   conflict, 422 validation.
-- Pagination: Laravel paginator shape, documented once as a shared
-  component and `$ref`'d.
+- Pagination: Laravel paginator shape inside the envelope's `meta` +
+  `links` keys, documented once in the shared `Envelope` component and
+  `$ref`'d.
 
-## Unified error format
+## Unified response envelope
 
-Exactly one error schema, `components/schemas/Error`, used by every
-4xx/5xx response:
+> Decision Q-B (approved): the API's real envelope supersedes the bare
+> `{message, errors}` Error schema this skill previously specified. The
+> spec (`docs/openapi/openapi.yaml`) is canonical for exact field
+> semantics; this section states the shape and the invariants.
+
+Every response — success and error — uses one envelope, documented once
+as a shared component (`components/schemas/Envelope`) and `$ref`'d:
 
 ```json
 {
-  "message": "human-readable, safe to display",
-  "errors": { "field": ["validation detail"] }
+  "success": true,
+  "data": {},
+  "meta": {},
+  "links": {},
+  "errors": null,
+  "redirect": null
 }
 ```
 
-- `errors` present only on 422.
+- `success` mirrors the HTTP status class: `true` on 2xx, `false` on
+  4xx/5xx.
+- `data` carries the resource payload; `meta` and `links` carry the
+  Laravel paginator shape on list endpoints.
+- `errors` is populated only on 422: `{ "field": ["validation detail"] }`.
+- `redirect` is a client redirect target when the flow requires one,
+  `null` otherwise.
 - Never leak internals: no exception class names, SQL, stack traces, or
-  file paths in `message` regardless of APP_DEBUG.
+  file paths anywhere in an error envelope, regardless of APP_DEBUG.
 - Optimistic-lock conflicts return 409 with a stable machine-readable
-  `message` the frontend can key on.
+  error text the frontend can key on.
 
 ## OpenAPI Governance
 
@@ -61,6 +77,18 @@ verification circular (code validated against itself proves nothing).
 - **No undocumented endpoints.** A route in `routes/api.php` with no spec
   path is a `blocker` for api-verifier.
 
+### Spec & docs exposure (security decision — approved)
+
+`/docs` (docs UI) and `/docs/openapi.yaml` are public **only in local**.
+In every other environment (staging, production) the routes are gated by
+environment config: return 404, or require admin authentication. Gate by
+env check, not by deleting the route — local DX stays unchanged. A
+publicly served spec hands out the complete attack surface (every
+endpoint, parameter, and auth requirement).
+
+security-reviewer flags docs routes reachable without the env gate as
+`major`.
+
 ### The sync rule (non-negotiable)
 
 Any of the following changes MUST update `docs/openapi/openapi.yaml`
@@ -72,7 +100,7 @@ Any of the following changes MUST update `docs/openapi/openapi.yaml`
 | FormRequest `rules()` change | `requestBody` schema updated |
 | `JsonResource` field added/removed/renamed/retyped | Response schema updated |
 | New status code returned | Response entry added |
-| Error payload change | Shared `Error` component updated |
+| Envelope/error payload change | Shared `Envelope` component updated |
 | Auth requirement change | `security` entry updated |
 
 The only escape hatch is an explicit `contract-invisible` justification
