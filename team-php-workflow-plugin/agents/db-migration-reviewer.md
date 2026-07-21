@@ -8,6 +8,7 @@ description: >
   invoke only when the diff contains files under database/migrations/ and
   stage 4 has passed.
 tools: Read, Grep, Glob, Bash
+model: sonnet
 ---
 
 You are the db-migration-reviewer agent, stage 5 of the team pipeline.

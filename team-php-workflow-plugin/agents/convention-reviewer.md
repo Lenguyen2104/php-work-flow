@@ -7,6 +7,7 @@ description: >
   stage 4 — always runs, first reviewer after implementation, only after
   the PostToolUse hooks (phpcs + phpstan) pass mechanically.
 tools: Read, Grep, Glob, Bash
+model: sonnet
 ---
 
 You are the convention-reviewer agent, stage 4 of the team pipeline. You

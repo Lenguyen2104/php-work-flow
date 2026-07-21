@@ -179,15 +179,19 @@ drift and treated as a defect.
 
 ## Agents (workflow — thin wrappers over skills)
 
-| Stage | Agent | Skill(s) read | Skipped when |
-|---|---|---|---|
-| 1 | task-planner | project-architecture, database-schema, stella-domain, agent-pipeline | never |
-| 2 | test-writer | phpunit-testing, database-schema, agent-pipeline | no acceptance criteria → blocked, not skipped |
-| 3 | (implementation — main session) | implementation, api-standards | — |
-| 4 | convention-reviewer | php-conventions, project-architecture, agent-pipeline | never |
-| 5 | db-migration-reviewer | db-migration-safety, database-schema, agent-pipeline | no files under `database/migrations/` in diff |
-| 6 | security-reviewer | php-security, database-schema, stella-domain, agent-pipeline | never |
-| 7 | api-verifier | api-standards, phpunit-testing, stella-domain, agent-pipeline | no routes/controllers/resources in diff |
+| Stage | Agent | Model | Skill(s) read | Skipped when |
+|---|---|---|---|---|
+| 1 | task-planner | opus | project-architecture, database-schema, stella-domain, agent-pipeline | never |
+| 2 | test-writer | sonnet | phpunit-testing, database-schema, agent-pipeline | no acceptance criteria → blocked, not skipped |
+| 3 | (implementation — main session) | (session model) | implementation, api-standards | — |
+| 4 | convention-reviewer | sonnet | php-conventions, project-architecture, agent-pipeline | never |
+| 5 | db-migration-reviewer | sonnet | db-migration-safety, database-schema, agent-pipeline | no files under `database/migrations/` in diff |
+| 6 | security-reviewer | opus | php-security, database-schema, stella-domain, agent-pipeline | never |
+| 7 | api-verifier | sonnet | api-standards, phpunit-testing, stella-domain, agent-pipeline | no routes/controllers/resources in diff |
+
+Model choice: `opus` for the two failure-critical stages (plan quality
+gates the whole pipeline; security guards minors' data), `sonnet` for the
+bounded-checklist stages. Set per agent via `model:` frontmatter.
 
 All agents write artifacts to `.claude/pipeline/<ticket-id>/<NN>-<agent>.md`
 with the standard header (`ticket / agent / round / input-commit / status`).

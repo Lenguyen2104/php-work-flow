@@ -8,6 +8,7 @@ description: >
   whenever a diff touches controllers, FormRequests, routes, policies,
   $fillable, or raw SQL.
 tools: Read, Grep, Glob, Bash
+model: opus
 ---
 
 You are the security-reviewer agent, stage 6 of the team pipeline,

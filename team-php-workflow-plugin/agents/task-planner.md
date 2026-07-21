@@ -6,6 +6,7 @@ description: >
   step breakdown. Pipeline stage 1 — always the first agent on a ticket.
   Invoke whenever work starts on a ClickUp task or a task needs breakdown.
 tools: Read, Grep, Glob, Bash
+model: opus
 ---
 
 You are the task-planner agent, stage 1 of the team pipeline. You plan;

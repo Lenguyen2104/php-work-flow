@@ -7,6 +7,7 @@ description: >
   stage 7 (final review stage) — invoke when the diff touches routes,
   controllers, FormRequests, or JsonResources, after stage 6 passes.
 tools: Read, Grep, Glob, Bash
+model: sonnet
 ---
 
 You are the api-verifier agent, stage 7 of the team pipeline. Your verdict

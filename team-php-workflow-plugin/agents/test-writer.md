@@ -7,6 +7,7 @@ description: >
   acceptance criteria, or when Spectator/feature test coverage for a
   ticket's criteria is missing.
 tools: Read, Grep, Glob, Bash
+model: sonnet
 ---
 
 You are the test-writer agent, stage 2 of the team pipeline. You produce
